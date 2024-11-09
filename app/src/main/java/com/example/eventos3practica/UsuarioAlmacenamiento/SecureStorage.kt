@@ -17,7 +17,7 @@ class SecureStorage(context: Context) {
     fun saveUser(user: User) {
         with(sharedPreferences.edit()) {
             putString("user_email", user.email)
-            putString("user_name", user.name)
+            putString("user_name", user.user)
             putString("user_password", user.password)
             putString("user_phone", user.phone)
             putString("user_address", user.address)
@@ -31,12 +31,31 @@ class SecureStorage(context: Context) {
         return if (storedEmail == email && storedPassword == password) {
             User(
                 email = storedEmail,
-                name = sharedPreferences.getString("user_name", null),
+                user = sharedPreferences.getString("user_name", null),
                 password = storedPassword,
                 phone = sharedPreferences.getString("user_phone", null),
                 address = sharedPreferences.getString("user_address", null),
                 historialMedico = null // Manejar el historial médico por separado
             )
+        } else {
+            null
+        }
+    }
+
+    fun getUserByUsername(username: String, password: String): User? {
+        val storedUsername = sharedPreferences.getString("user_name", null)
+        val storedPassword = sharedPreferences.getString("user_password", null)
+        return if (storedUsername == username && storedPassword == password) {
+            sharedPreferences.getString("user_email", null)?.let {
+                User(
+                    email = it,
+                    user = storedUsername,
+                    password = storedPassword,
+                    phone = sharedPreferences.getString("user_phone", null),
+                    address = sharedPreferences.getString("user_address", null),
+                    historialMedico = null // Manejar el historial médico por separado
+                )
+            }
         } else {
             null
         }
