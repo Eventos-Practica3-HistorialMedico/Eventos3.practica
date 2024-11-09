@@ -12,12 +12,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.eventos3practica.Historial.HistorialScreen
 import com.example.eventos3practica.Login.LoginScreen
+import com.example.eventos3practica.UsuarioAlmacenamiento.AlmacenamientoHistorial
 import com.example.eventos3practica.UsuarioAlmacenamiento.UserManager
 import com.example.eventos3practica.ui.theme.Eventos3practicaTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AlmacenamientoHistorial.init(this)
         UserManager.init(this) // Inicializa UserManager
         setContent {
             Eventos3practicaTheme {

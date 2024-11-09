@@ -34,8 +34,7 @@ class SecureStorage(context: Context) {
                 user = sharedPreferences.getString("user_name", null),
                 password = storedPassword,
                 phone = sharedPreferences.getString("user_phone", null),
-                address = sharedPreferences.getString("user_address", null),
-                historialMedico = null // Manejar el historial médico por separado
+                address = sharedPreferences.getString("user_address", null)
             )
         } else {
             null
@@ -52,8 +51,7 @@ class SecureStorage(context: Context) {
                     user = storedUsername,
                     password = storedPassword,
                     phone = sharedPreferences.getString("user_phone", null),
-                    address = sharedPreferences.getString("user_address", null),
-                    historialMedico = null // Manejar el historial médico por separado
+                    address = sharedPreferences.getString("user_address", null)
                 )
             }
         } else {

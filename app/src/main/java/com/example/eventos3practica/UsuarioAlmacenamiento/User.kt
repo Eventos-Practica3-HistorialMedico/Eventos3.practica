@@ -2,6 +2,8 @@ package com.example.eventos3practica.UsuarioAlmacenamiento
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.Relation
+import androidx.room.Embedded
 
 @Entity(tableName = "users")
 data class User(
@@ -9,6 +11,14 @@ data class User(
     val user: String?,
     val password: String?,
     val phone: String?,
-    val address: String?,
-    val historialMedico: HistorialMedico?
+    val address: String?
+)
+
+data class UserWithHistorialMedico(
+    @Embedded val user: User,
+    @Relation(
+        parentColumn = "email",
+        entityColumn = "userEmail"
+    )
+    val historialMedico: List<HistorialMedico>
 )

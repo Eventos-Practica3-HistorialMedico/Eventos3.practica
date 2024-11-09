@@ -16,8 +16,7 @@ object UserManager {
             user = "user",
             password = "user",
             phone = "1234567890",
-            address = "123 Default St",
-            historialMedico = null
+            address = "123 Default St"
         )
         addUser(defaultUser)
     }

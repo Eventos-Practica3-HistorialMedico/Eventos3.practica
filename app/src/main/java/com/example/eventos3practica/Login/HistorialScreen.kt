@@ -1,17 +1,18 @@
 package com.example.eventos3practica.Historial
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.eventos3practica.UsuarioAlmacenamiento.AlmacenamientoHistorial
 import com.example.eventos3practica.UsuarioAlmacenamiento.HistorialMedico
+import kotlinx.coroutines.launch
 
 @Composable
 fun HistorialScreen(email: String, modifier: Modifier = Modifier) {
@@ -20,6 +21,9 @@ fun HistorialScreen(email: String, modifier: Modifier = Modifier) {
     val diagnostico = remember { mutableStateOf("") }
     val tratamiento = remember { mutableStateOf("") }
     val message = remember { mutableStateOf("") }
+    val historial = remember { mutableStateOf<List<HistorialMedico>?>(null) }
+    val selectedHistorial = remember { mutableStateOf<HistorialMedico?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -74,20 +78,79 @@ fun HistorialScreen(email: String, modifier: Modifier = Modifier) {
                 }
             )
             Button(onClick = {
-                val historialMedico = HistorialMedico(
-                    id = null,
-                    fecha = fecha.value,
-                    descripcion = descripcion.value,
-                    diagnostico = diagnostico.value,
-                    tratamiento = tratamiento.value
-                )
-                AlmacenamientoHistorial.addHistorialMedico(email, historialMedico)
-                message.value = "Historial guardado exitosamente"
+                coroutineScope.launch {
+                    val historialMedico = HistorialMedico(
+                        id = selectedHistorial.value?.id ?: 0,
+                        userEmail = email,
+                        fecha = fecha.value,
+                        descripcion = descripcion.value,
+                        diagnostico = diagnostico.value,
+                        tratamiento = tratamiento.value
+                    )
+                    if (selectedHistorial.value == null) {
+                        AlmacenamientoHistorial.addHistorialMedico(email, historialMedico)
+                        message.value = "Historial guardado exitosamente"
+                    } else {
+                        AlmacenamientoHistorial.updateHistorialMedico(email, historialMedico)
+                        message.value = "Historial actualizado exitosamente"
+                        selectedHistorial.value = null
+                    }
+                }
             }) {
-                Text("Guardar")
+                Text(if (selectedHistorial.value == null) "Guardar" else "Actualizar")
+            }
+            Button(onClick = {
+                coroutineScope.launch {
+                    val historiales = AlmacenamientoHistorial.getHistorialesMedicos(email)
+                    if (historiales.isNullOrEmpty()) {
+                        message.value = "Historial vacío"
+                    } else {
+                        historial.value = historiales
+                        message.value = ""
+                    }
+                }
+            }) {
+                Text("Mostrar Historial")
             }
             if (message.value.isNotEmpty()) {
                 Text(message.value)
+            }
+            historial.value?.let {
+                LazyColumn {
+                    items(it) { historialMedico ->
+                        Column(
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            Text("Fecha: ${historialMedico.fecha}")
+                            Text("Descripción: ${historialMedico.descripcion}")
+                            Text("Diagnóstico: ${historialMedico.diagnostico}")
+                            Text("Tratamiento: ${historialMedico.tratamiento}")
+                            Row {
+                                Button(onClick = {
+                                    selectedHistorial.value = historialMedico
+                                    fecha.value = historialMedico.fecha ?: ""
+                                    descripcion.value = historialMedico.descripcion ?: ""
+                                    diagnostico.value = historialMedico.diagnostico ?: ""
+                                    tratamiento.value = historialMedico.tratamiento ?: ""
+                                }) {
+                                    Text("Editar")
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Button(onClick = {
+                                    coroutineScope.launch {
+                                        AlmacenamientoHistorial.deleteHistorialMedico(email, historialMedico)
+                                        val updatedHistoriales = AlmacenamientoHistorial.getHistorialesMedicos(email)
+                                        historial.value = updatedHistoriales
+                                        message.value = "Historial eliminado exitosamente"
+                                    }
+                                }) {
+                                    Text("Borrar")
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+                }
             }
         }
     }
