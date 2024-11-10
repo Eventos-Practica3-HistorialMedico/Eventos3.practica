@@ -116,6 +116,15 @@ fun HistorialScreen(email: String, modifier: Modifier = Modifier) {
             }) {
                 Text("Mostrar Historial")
             }
+            Button(onClick = {
+                if (historial.value.isNullOrEmpty()) {
+                    message.value = "No hay historial para compartir"
+                } else {
+                    message.value = "Historial compartido con el médico exitosamente"
+                }
+            }) {
+                Text("Compartir Historial")
+            }
             if (message.value.isNotEmpty()) {
                 Text(message.value)
             }
