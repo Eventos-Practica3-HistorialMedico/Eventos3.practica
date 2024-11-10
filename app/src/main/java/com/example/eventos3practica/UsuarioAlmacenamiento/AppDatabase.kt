@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [User::class, HistorialMedico::class], version = 1)
+@Database(entities = [User::class, HistorialMedico::class], version = 3) // Incremented version number
 abstract class AppDatabase : RoomDatabase() {
     abstract fun historialMedicoDao(): HistorialMedicoDao
     abstract fun userDao(): UserDao
@@ -20,7 +20,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration()
+                .build()
                 INSTANCE = instance
                 instance
             }
