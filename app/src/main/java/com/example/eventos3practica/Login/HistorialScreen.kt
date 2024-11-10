@@ -39,7 +39,7 @@ fun HistorialScreen(email: String, modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 decorationBox = { innerTextField ->
                     if (fecha.value.isEmpty()) {
-                        Text("Fecha")
+                        Text("Fecha (yyyy-MM-dd)")
                     }
                     innerTextField()
                 }
@@ -79,21 +79,25 @@ fun HistorialScreen(email: String, modifier: Modifier = Modifier) {
             )
             Button(onClick = {
                 coroutineScope.launch {
-                    val historialMedico = HistorialMedico(
-                        id = selectedHistorial.value?.id ?: 0,
-                        userEmail = email,
-                        fecha = fecha.value,
-                        descripcion = descripcion.value,
-                        diagnostico = diagnostico.value,
-                        tratamiento = tratamiento.value
-                    )
-                    if (selectedHistorial.value == null) {
-                        AlmacenamientoHistorial.addHistorialMedico(email, historialMedico)
-                        message.value = "Historial guardado exitosamente"
-                    } else {
-                        AlmacenamientoHistorial.updateHistorialMedico(email, historialMedico)
-                        message.value = "Historial actualizado exitosamente"
-                        selectedHistorial.value = null
+                    try {
+                        val historialMedico = HistorialMedico(
+                            id = selectedHistorial.value?.id ?: 0,
+                            userEmail = email,
+                            fecha = fecha.value,
+                            descripcion = descripcion.value,
+                            diagnostico = diagnostico.value,
+                            tratamiento = tratamiento.value
+                        )
+                        if (selectedHistorial.value == null) {
+                            val result = AlmacenamientoHistorial.addHistorialMedico(email, historialMedico)
+                            message.value = result
+                        } else {
+                            AlmacenamientoHistorial.updateHistorialMedico(email, historialMedico)
+                            message.value = "Historial actualizado exitosamente"
+                            selectedHistorial.value = null
+                        }
+                    } catch (e: Exception) {
+                        message.value = e.message ?: "Ocurrió un error"
                     }
                 }
             }) {

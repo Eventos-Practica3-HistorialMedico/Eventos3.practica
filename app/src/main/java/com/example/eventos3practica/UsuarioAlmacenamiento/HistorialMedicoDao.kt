@@ -17,6 +17,9 @@ interface HistorialMedicoDao {
     @Delete
     fun delete(historialMedico: HistorialMedico)
 
+    @Query("SELECT * FROM historial_medico WHERE userEmail = :email AND fecha = :fecha AND descripcion = :descripcion AND diagnostico = :diagnostico AND tratamiento = :tratamiento")
+    fun findDuplicate(email: String, fecha: String?, descripcion: String?, diagnostico: String?, tratamiento: String?): HistorialMedico?
+
     @Query("SELECT * FROM historial_medico WHERE userEmail = :email")
     fun getHistorialesMedicos(email: String): List<HistorialMedico>
 }
